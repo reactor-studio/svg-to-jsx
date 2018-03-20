@@ -165,6 +165,18 @@ describe('svg-to-jsx', function() {
             });
         });
 
+        it('should apply custom styles', function(done) {
+            var input = '<svg version="1.1"><path style="font-family: Verdana; margin-bottom: 10px; -webkit-transition: all; ms-transition: all;"/></svg>';
+            var props = { width: '15px', height: '30px' };
+
+            svgToJsx(input, { props }, function(error, result) {
+                expect(error).to.be(null);
+                expect(result).to.be('<svg version="1.1" width="15px" height="30px">\n\t<path style={{"fontFamily":"Verdana","marginBottom":"10px","WebkitTransition":"all","msTransition":"all"}}/>\n</svg>');
+
+                done();
+            });
+        });
+
         it('should allow to pick only specific element', function(done) {
             var input = '<svg version="1.1"><path style="font-family: Verdana"/><path id="root"/></svg>';
 
@@ -268,7 +280,7 @@ describe('svg-to-jsx', function() {
                 done();
             });
         });
-      
+
         it('should preserve case on tag names', function(done) {
             var input = '<svg version="1.1"><linearGradient/></svg>';
 

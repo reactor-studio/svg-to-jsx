@@ -117,21 +117,34 @@ function beforeBuildSVG(options, parsed) {
         passChildrenTo.text = [passChildrenTo.text || '', '{this.props.children}'].join('\n');
     }
 
+    if (options) {
+        parsed.attributes = assign(parsed.attributes, options.props);
+    }
+
     return formatElementForXMLBuilder(parsed);
 }
 
-function afterBuildSVG(built) {
+function afterBuildSVG(options, built) {
+    // console.log('options ----> ', options);
     return built
         .replace(/style="((?:[^"\\]|\\.)*)"/ig, function(matched, styleString) {
+            console.log('styleString =====> ', styleString);
+            
             var style = styleString.split(/\s*;\s*/g).filter(Boolean).reduce(function(hash, rule) {
                 var keyValue = rule.split(/\s*\:\s*(.*)/);
                 var property = utils.cssProperty(keyValue[0]);
                 var value = keyValue[1];
 
+                console.log('keyValue ----> ', keyValue);
+                console.log('property ----> ', property);
+                console.log('value ----> ', value);
+                
                 hash[property] = value;
 
                 return hash;
             }, {});
+
+            // console.log('style ----> ', style);
 
             return 'style={' + JSON.stringify(style) + '}';
         })
@@ -145,19 +158,21 @@ function buildSVG(object) {
 }
 
 module.exports = function svgToJsx(svg, options, callback) {
+    const props = options ? options.props : null;
+
     if (arguments.length === 2) {
         callback = options;
         options = {};
     }
 
-    options = assign({}, defaults, options);
+    options = assign({ props }, defaults, options);
 
     var promise = q
         .nfcall(parseSVG, svg)
         .then(afterParseSVG)
         .then(beforeBuildSVG.bind(null, options))
         .then(buildSVG)
-        .then(afterBuildSVG);
+        .then(afterBuildSVG.bind(null, options));
 
     if (callback) {
         promise.done(function(result) {
