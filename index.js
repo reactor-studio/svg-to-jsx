@@ -124,27 +124,18 @@ function beforeBuildSVG(options, parsed) {
     return formatElementForXMLBuilder(parsed);
 }
 
-function afterBuildSVG(options, built) {
-    // console.log('options ----> ', options);
+function afterBuildSVG(built) {
     return built
         .replace(/style="((?:[^"\\]|\\.)*)"/ig, function(matched, styleString) {
-            console.log('styleString =====> ', styleString);
-            
             var style = styleString.split(/\s*;\s*/g).filter(Boolean).reduce(function(hash, rule) {
                 var keyValue = rule.split(/\s*\:\s*(.*)/);
                 var property = utils.cssProperty(keyValue[0]);
                 var value = keyValue[1];
 
-                console.log('keyValue ----> ', keyValue);
-                console.log('property ----> ', property);
-                console.log('value ----> ', value);
-                
                 hash[property] = value;
 
                 return hash;
             }, {});
-
-            // console.log('style ----> ', style);
 
             return 'style={' + JSON.stringify(style) + '}';
         })
@@ -172,7 +163,7 @@ module.exports = function svgToJsx(svg, options, callback) {
         .then(afterParseSVG)
         .then(beforeBuildSVG.bind(null, options))
         .then(buildSVG)
-        .then(afterBuildSVG.bind(null, options));
+        .then(afterBuildSVG);
 
     if (callback) {
         promise.done(function(result) {
