@@ -165,7 +165,7 @@ module.exports = function svgToJsx(svg, options, callback) {
         .then(buildSVG)
         .then(afterBuildSVG);
 
-    if (callback) {
+    if (callback && typeof callback === 'function') {
         promise.done(function(result) {
             callback(null, result);
         }, function(error) {
