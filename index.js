@@ -149,7 +149,7 @@ function buildSVG(object) {
 }
 
 module.exports = function svgToJsx(svg, options, callback) {
-    const props = options ? options.props : null;
+    var props = options ? options.props : null;
 
     if (arguments.length === 2) {
         callback = options;
